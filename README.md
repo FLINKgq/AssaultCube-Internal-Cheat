@@ -2,8 +2,7 @@
 
 Compile ONLY in Debug mode! In Release mode, shitass compiler optimizations do random shit and silent aim just completely breaks. 
 
-TODO:             
-Move to signatures where possible.             
+TODO:                      
 Implement a gamemode check to not to turn on friendly fire in some gamemodes.           
 Triggerbot          
  
