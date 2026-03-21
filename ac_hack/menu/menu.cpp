@@ -6,7 +6,6 @@
 #include "../movement/movement.h"
 #include "../littleFeatures/littleFeatures.h"
 #include "../aimbot/aimbot.h"
-#include "../noRecoil/noRecoil.h"
 #include "../cheatMemory/cheatMemory.h"
 #include <vector>
 #include <string>
@@ -245,15 +244,9 @@ void Menu::Draw() {
             }
 
             if (ImGui::BeginTabItem("Weapon")) {
-                {
-                    bool tempEnabled = Globals::Settings::NoRecoil::isEnabled.load();
-                    if (ImGui::Checkbox("No recoil", &tempEnabled)) {
-                        Globals::Settings::NoRecoil::isEnabled.store(tempEnabled);
-                        float newRecoilConst = Globals::Settings::NoRecoil::isEnabled ? 0.0f : -0.0099999998f;
-                        Memory::patchds((Globals::Addresses::baseAddress + Globals::Addresses::Offssets::recoilConst), &newRecoilConst, sizeof(float));
-                    }
-                }
 
+                   ImGui::Checkbox("No recoil and no spread", &Globals::Settings::Hooks::noSpreadANDRecoilOn);
+               
                 {
                     bool tempEnabled = Globals::Settings::LittleFeatures::infiniteAmmoOn.load();
                     if (ImGui::Checkbox("Infinite ammo", &tempEnabled)) {
@@ -265,12 +258,6 @@ void Menu::Draw() {
                     bool tempEnabled = Globals::Settings::LittleFeatures::rapidFireOn.load();
                     if (ImGui::Checkbox("Rapid fire", &tempEnabled)) {
                         Globals::Settings::LittleFeatures::rapidFireOn.store(tempEnabled);
-                    }
-                }
-
-                {
-                    if (ImGui::Checkbox("No spread", &Globals::Settings::LittleFeatures::noSpreadOn)) {
-                        Memory::patchNoSpread();
                     }
                 }
 

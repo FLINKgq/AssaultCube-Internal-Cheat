@@ -3,25 +3,6 @@
 #include "../globals/globals.h"
 
 namespace Memory {
-    void unpatchAll() {
-        patchNoSpread(false);
-    }
-
-    void patchNoSpread(bool notActive) {
-        patch(
-            Globals::Addresses::baseAddress + Globals::Addresses::Offssets::noSpread,
-            std::vector<BYTE>{ 0x0F, 0x8E, 0x99, 0x00, 0x00, 0x00},
-            std::vector<BYTE>{ 0xE9, 0x9A, 0x00, 0x00, 0x00, 0x90 },
-            notActive);
-    }
-
-    void patchNoSpread() {
-        patch(
-            Globals::Addresses::baseAddress + Globals::Addresses::Offssets::noSpread,
-            std::vector<BYTE>{ 0x0F, 0x8E, 0x99, 0x00, 0x00, 0x00},
-            std::vector<BYTE>{ 0xE9, 0x9A, 0x00, 0x00, 0x00, 0x90 },
-            Globals::Settings::LittleFeatures::noSpreadOn);
-    }
 
     void patch(uintptr_t address, const std::vector<BYTE>& oldBytes, const std::vector<BYTE>& newBytes, bool bIsActive) {
         const std::vector<BYTE>& bytesToWrite = bIsActive ? newBytes : oldBytes;
@@ -89,5 +70,57 @@ namespace Memory {
 
         //tell the program to execute the __except block
         return EXCEPTION_EXECUTE_HANDLER;
+    }
+
+    namespace {
+        // function for "55 8B ? 00" -> byte arrey where -1 means "?"
+        std::vector<int> PatternToBytes(const char* pattern) {
+            std::vector<int> bytes;
+            char* start = const_cast<char*>(pattern);
+            char* end = const_cast<char*>(pattern) + strlen(pattern);
+
+            for (auto current = start; current < end; ++current) {
+                if (*current == '?') {
+                    ++current;
+                    if (*current == '?') ++current;
+                    bytes.push_back(-1); // -1 means any byte (wildcard)
+                }
+                else {
+                    bytes.push_back(strtoul(current, &current, 16));
+                }
+            }
+            return bytes;
+        };
+    }
+
+    namespace SigScanner {
+
+        uintptr_t FindPattern(HMODULE hModule, const char* pattern) {
+            if (!hModule) return 0;
+
+            auto dosHeader = (PIMAGE_DOS_HEADER)hModule;
+            auto ntHeaders = (PIMAGE_NT_HEADERS)((uint8_t*)hModule + dosHeader->e_lfanew);
+
+            auto sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
+            auto patternBytes = PatternToBytes(pattern);
+            uint8_t* scanBytes = reinterpret_cast<uint8_t*>(hModule);
+
+            auto s = patternBytes.size();
+            auto d = patternBytes.data();
+
+            for (auto i = 0ul; i < sizeOfImage - s; ++i) {
+                bool found = true;
+                for (auto j = 0ul; j < s; ++j) {
+                    if (scanBytes[i + j] != d[j] && d[j] != -1) {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found) {
+                    return reinterpret_cast<uintptr_t>(&scanBytes[i]);
+                }
+            }
+            return 0; //didn't find
+        }
     }
 }

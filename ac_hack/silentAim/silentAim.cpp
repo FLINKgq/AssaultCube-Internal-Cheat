@@ -12,7 +12,7 @@ namespace {
     typedef void(__cdecl* RayDamageType)(float* from, float* to, int* gunOwner);
 
     void shoot(float* from, float* to, Entity* gunOwner) {
-        uintptr_t address = Globals::Addresses::baseAddress + Globals::Addresses::FunctionOffsets::rayDamage;
+        uintptr_t address = Globals::Addresses::FunctionAddresses::rayDamage;
         RayDamageType rayDamage = (RayDamageType)address;
 
       /*  std::cout << "from = " << from << std::endl;

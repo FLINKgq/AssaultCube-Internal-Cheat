@@ -14,15 +14,16 @@ namespace Globals {
 
 	namespace Addresses{
 		inline uintptr_t baseAddress = 0;
-
+	
 		namespace Offssets {
 			inline uintptr_t viewMatrix = 0;
 			inline uintptr_t recoilConst = 0;
 			inline uintptr_t noSpread = 0;
 		}
 
-		namespace FunctionOffsets {
+		namespace FunctionAddresses {
 			inline uintptr_t rayDamage = 0;
+			inline uintptr_t attackPhysics = 0;
 		}
 	}
 
@@ -37,10 +38,6 @@ namespace Globals {
 
 		namespace Menu {
 			inline bool draw = false;
-		}
-
-		namespace NoRecoil {
-			inline std::atomic<bool> isEnabled = false;
 		}
 
 		namespace Esp {
@@ -63,7 +60,7 @@ namespace Globals {
 			inline std::atomic<bool> infiniteAmmoOn = false;
 			inline std::atomic<bool> rapidFireOn = false;
 			inline std::atomic<bool> godModeOn = false;
-			inline bool noSpreadOn = false;
+		
 		}
 
 		namespace SpeedHack {
@@ -83,5 +80,14 @@ namespace Globals {
 				inline std::atomic<bool> ToClosestEnemyToTheCrosshair = false; //i hate fat peo
 			}
 		}
+		
+		namespace Hooks {
+			inline bool noSpreadANDRecoilOn = false;
+		}
+	}
+
+	namespace Signatures {
+		constexpr const char* attackPhysics = "83 EC ? 53 55 8B 6C 24 ? 56 57 8B F9 8B 45 ? F3 0F 7E 45 ? 66 0F D6 44 24 ? F3 0F 10 44 24 ? F3 0F 10 54 24 ? 89 44 24 ?";
+		constexpr const char* rayDamage = "55 8B EC 83 E4 ? 81 EC ? ? ? ? 53 8B DA 89 4C 24";
 	}
 }

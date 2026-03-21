@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "gameManager.h"
 #include "aimbot/aimbot.h"
-#include "noRecoil/noRecoil.h"
 #include "hooks/hooks.h"
 #include "render/render.h"
 #include "globals/globals.h"
@@ -30,7 +29,7 @@
 #endif
 
 #ifndef _DEBUG
-#error "Compile ONLY in Debug mode! Release mode optimizations break Silent Aim."
+#error "Compile ONLY in Debug mode!!!! Release mode shitass optimizations break Silent Aim."
 #endif
 
 namespace Core {
@@ -54,7 +53,6 @@ namespace Core {
 
                 Hooks::Init();
                 Aimbot::start();
-                NoRecoil::start();
                 LittleFeatures::start();
                 Movement::start();
                 SilentAim::start();
@@ -64,13 +62,10 @@ namespace Core {
                 }
 
                 Globals::cheatIsEnabled = false;
-                NoRecoil::shutdown();
                 Aimbot::shutdown();
                 LittleFeatures::shutdown();
                 Movement::shutdown();
                 SilentAim::shutdown();
-
-                Memory::unpatchAll();
                 Hooks::Shutdown();
                 Render::Shutdown();
             }
