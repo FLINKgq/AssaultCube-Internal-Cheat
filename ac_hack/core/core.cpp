@@ -33,18 +33,20 @@
 #endif
 
 namespace Core {
-	void init(void* hModule) {
-		Globals::init();
-        std::thread cheatThread(mainLoop, hModule);
-        cheatThread.detach();
-	}
+    void init(void* hModule) {
+        Globals::init();
+        HANDLE hThread = CreateThread(nullptr, 0, mainLoop, hModule, 0, nullptr);
+        if (hThread) {
+            CloseHandle(hThread);
+        }
+    }
 
-	void mainLoop(void* hM) {
+    DWORD WINAPI mainLoop(LPVOID lpParam) {
 
 #ifdef _DEBUG //we can do it this way because we don't have any heavy calculations inside std::cout anywhere in the code
             ShowConsole();
 #endif
-            HMODULE hModule = static_cast<HMODULE>(hM);
+            HMODULE hModule = static_cast<HMODULE>(lpParam);
             {
                 Globals::init();
                 if (!Globals::gameManager || !Globals::Addresses::baseAddress) {
@@ -69,7 +71,11 @@ namespace Core {
                 Hooks::Shutdown();
                 Render::Shutdown();
             }
+
+            std::cout << "exit done\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
             HideConsole();
             FreeLibraryAndExitThread(hModule, 0);
+            
 	}
 }

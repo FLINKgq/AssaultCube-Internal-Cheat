@@ -1,6 +1,7 @@
 #pragma once
+#include <windows.h>
 
 namespace Core {
 	 void init(void* hModule);
-	 void mainLoop(void* hModule);
+	 DWORD WINAPI mainLoop(LPVOID lpParam);
 }
